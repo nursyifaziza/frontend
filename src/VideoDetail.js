@@ -1,6 +1,6 @@
 import {useParams} from 'react-router-dom';
 import {useFetch} from './hooks/useFetch';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 
 const VideoDetail = () => {
     const {videoId} = useParams();
@@ -11,6 +11,24 @@ const VideoDetail = () => {
 
     const [newComment,
         setNewComment] = useState({username: '', text: ''});
+    const [commentsState,
+        setCommentsState] = useState([]);
+
+    useEffect(() => {
+        setCommentsState(comments); // Update the commentsState with the fetched comments
+    }, [comments]);
+
+    const refreshComments = async() => {
+        try {
+            const response = await fetch(`/api/comments/${videoId}`);
+            if (response.ok) {
+                const data = await response.json();
+                setCommentsState(data);
+            }
+        } catch (error) {
+            console.error('Error refreshing comments:', error);
+        }
+    }
 
     const handleCommentChange = (event) => {
         const {name, value} = event.target;
@@ -24,16 +42,18 @@ const VideoDetail = () => {
         event.preventDefault();
 
         try {
-            const response = await fetch(`/api/comments/${videoId}`, {
+            const response = await fetch(`http://localhost:5000/api/comments/${videoId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(newComment)
+                body: JSON.stringify({username: newComment.username, text: newComment.text, videoId: videoId})
             });
 
+            console.log(JSON.stringify({username: newComment.username, text: newComment.text, videoId: videoId}));
             if (response.ok) {
                 setNewComment({username: '', text: ''});
+                refreshComments();
             }
         } catch (error) {
             console.error('Error submitting comment:', error);
@@ -60,7 +80,7 @@ const VideoDetail = () => {
             <div className='comments-section'>
                 <h2>Comments</h2>
                 <ul>
-                    {comments.map(comment => (
+                    {commentsState.map(comment => (
                         <li key={comment._id}>
                             <p>{comment.username}</p>
                             <p>{comment.text}</p>
@@ -69,7 +89,7 @@ const VideoDetail = () => {
                 </ul>
 
                 <form onSubmit={handleCommentSubmit}>
-                    <h2>Comments</h2>
+                    <h2>Add a Comment</h2>
                     <input
                         type='text'
                         name='username'
@@ -81,7 +101,7 @@ const VideoDetail = () => {
                         value={newComment.text}
                         onChange={handleCommentChange}
                         placeholder='Your Comment'/>
-                    <button type='submit'>Submit Comment</button>
+                    <button type='submit'>Submit Comment {console.log(newComment)}</button>
                 </form>
             </div>
 
