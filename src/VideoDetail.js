@@ -1,5 +1,6 @@
 import {useParams} from 'react-router-dom';
 import {useFetch} from './hooks/useFetch';
+import {useState} from 'react';
 
 const VideoDetail = () => {
     const {videoId} = useParams();
@@ -8,9 +9,36 @@ const VideoDetail = () => {
     const {data: comments, loading: commentsLoading, error: commentsError} = useFetch(`/api/comments/${videoId}`);
     const {data: productList, loading: productListLoading, error: productListError} = useFetch(`/api/products/${videoId}`);
 
-    console.log('Video Data:', video);
-    console.log('Comments Data:', comments);
-    console.log('Product List Data:', productList);
+    const [newComment,
+        setNewComment] = useState({username: '', text: ''});
+
+    const handleCommentChange = (event) => {
+        const {name, value} = event.target;
+        setNewComment((prevComment) => ({
+            ...prevComment,
+            [name]: value
+        }));
+    };
+
+    const handleCommentSubmit = async(event) => {
+        event.preventDefault();
+
+        try {
+            const response = await fetch(`/api/comments/${videoId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newComment)
+            });
+
+            if (response.ok) {
+                setNewComment({username: '', text: ''});
+            }
+        } catch (error) {
+            console.error('Error submitting comment:', error);
+        }
+    }
 
     if (videoLoading || commentsLoading || productListLoading) {
         return <div>Loading...</div>;
@@ -40,7 +68,21 @@ const VideoDetail = () => {
                     ))}
                 </ul>
 
-                {/* Comment submission form */}
+                <form onSubmit={handleCommentSubmit}>
+                    <h2>Comments</h2>
+                    <input
+                        type='text'
+                        name='username'
+                        value={newComment.username}
+                        onChange={handleCommentChange}
+                        placeholder='Your Name'/>
+                    <textarea
+                        name='text'
+                        value={newComment.text}
+                        onChange={handleCommentChange}
+                        placeholder='Your Comment'/>
+                    <button type='submit'>Submit Comment</button>
+                </form>
             </div>
 
             <div className='product-list'>
