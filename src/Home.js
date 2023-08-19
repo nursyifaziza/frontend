@@ -2,6 +2,7 @@ import React from 'react';
 import './styles/styles.css';
 import VideoThumbnail from './VideoThumbnail';
 import {useFetch} from './hooks/useFetch';
+import {Heading} from '@chakra-ui/react'
 
 const Home = () => {
     const {data: videos, loading, error} = useFetch('api/videos');
@@ -16,7 +17,7 @@ const Home = () => {
 
     return (
         <div className='home-container'>
-            <h1>Live Shopping Videos</h1>
+            <Heading as='h1' fontWeight={800} textAlign='left'>Live Shopping Videos</Heading>
             <div className='video-thumbnails'>
                 {videos.map(video => (<VideoThumbnail key={video._id} video={video}/>))}
             </div>

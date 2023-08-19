@@ -1,6 +1,7 @@
 import {useParams} from 'react-router-dom';
 import {useFetch} from './hooks/useFetch';
 import {useState, useEffect} from 'react';
+import {Button, Heading, Input, Textarea, VStack } from '@chakra-ui/react'
 
 const VideoDetail = () => {
     const {videoId} = useParams();
@@ -78,7 +79,7 @@ const VideoDetail = () => {
                 allowFullScreen></iframe>
 
             <div className='comments-section'>
-                <h2>Comments</h2>
+                <Heading as='h3' size='lg'>Comments</Heading>
                 <ul>
                     {commentsState.map(comment => (
                         <li key={comment._id}>
@@ -89,24 +90,26 @@ const VideoDetail = () => {
                 </ul>
 
                 <form onSubmit={handleCommentSubmit}>
-                    <h2>Add a Comment</h2>
-                    <input
-                        type='text'
-                        name='username'
-                        value={newComment.username}
-                        onChange={handleCommentChange}
-                        placeholder='Your Name'/>
-                    <textarea
-                        name='text'
-                        value={newComment.text}
-                        onChange={handleCommentChange}
-                        placeholder='Your Comment'/>
-                    <button type='submit'>Submit Comment {console.log(newComment)}</button>
+                    <Heading as='h3' size='lg'>Add a Comment</Heading>
+                    <VStack spacing='16px'>
+                        <Input
+                            type='text'
+                            name='username'
+                            value={newComment.username}
+                            onChange={handleCommentChange}
+                            placeholder='Your username'/>
+                        <Textarea
+                            name='text'
+                            value={newComment.text}
+                            onChange={handleCommentChange}
+                            placeholder='Your comment'/>
+                        <Button colorScheme='green' type='submit'>Submit Comment {console.log(newComment)}</Button>
+                    </VStack>
                 </form>
             </div>
 
             <div className='product-list'>
-                <h2>Product List</h2>
+                <Heading as='h3' size='lg'>Product List</Heading>
                 <ul>
                     {productList.map(product => (
                         <li key={product._id}>
